@@ -31,7 +31,7 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    // how can we pass retrofit into this? since we already told it how it can create the rotrofit object,
+    // how can we pass retrofit into this? since we already told it how it can create the retrofit object,
     // we can declare the method parameter, and when dagger later wants to use this method to create the
     // unsplashApi interface, it looks for retrofit and sees the provideRetrofit method
     @Provides

@@ -41,7 +41,12 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
 
         binding.apply {
             recycler_view.setHasFixedSize(true)
-            recycler_view.adapter = adapter
+
+            // now after creating the photo  load state adapter
+            recycler_view.adapter = adapter.withLoadStateHeaderAndFooter(
+                header = UnsplashPhotoLoadStateAdapter  { adapter.retry() },
+                footer = UnsplashPhotoLoadStateAdapter { adapter.retry() }
+            )
         }
 
         // observe photos live data. important to pass viewLifecycleOwner to the live

@@ -10,6 +10,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.12777777777777777" />
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.28894927536231885" />
         <entry key="app/src/main/res/layout/unsplash_item.xml" value="0.12073231073725878" />
+        <entry key="app/src/main/res/layout/unsplash_photo_load_state_footerr.xml" value="0.103125" />
       </map>
     </option>
   </component>
