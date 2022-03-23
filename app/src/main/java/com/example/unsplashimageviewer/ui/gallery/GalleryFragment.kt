@@ -1,7 +1,10 @@
 package com.example.unsplashimageviewer.ui.gallery
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.unsplashimageviewer.R
@@ -63,6 +66,45 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
             // lifecycles and callbackas in fragments, you want to have them scoped to the fragments view becasu this is only the part
             // that ids visible on the screen. the fragtment instance itself is just a container.
         }
+
+        setHasOptionsMenu(true) // need this to display the options menu in the fragment - won't even see it
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_gallery, menu)
+        // make reference to the search functino
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as androidx.appcompat.widget.SearchView // make sure this is androidx SearchView
+        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                // search when we press the search button, which calls this textSubmit button and will return true
+                // p0 is the search string that we get passed in the menu
+                if ( p0 != null) {
+                    viewModel.searchPhotos(p0)
+                    // remember this is the functino we created earlier which changes the value of the current query
+                    // which triggers the switchmatch that executes a new search and this should change the photos liveData
+                    // which we observe in the fragment so we should be notified of the update. all we need to do is call
+                    // this method and return true as well
+
+
+                    // we do this here because of diffUtil - if the old dataset and the new data set have a similar item
+                    // in them, diffutil may keep the scroll position at this item. with this method we make sure we jump
+                    // back to the top of the list of new search items
+                    binding.recyclerView.scrollToPosition(0)
+
+                    searchView.clearFocus() // hides the keyboard after we submit the search
+                }
+                return true;
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                // don't do anything here - we don't want to start searching while we are still typing. just return true
+                return true;
+            }
+
+        })
+
     }
 
     // calling this and setting binding to null to release the reference will be released when the view is destroyed
