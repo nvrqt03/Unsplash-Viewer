@@ -16,9 +16,9 @@ interface UnsplashApi {
         // by putting constants in the companion object, we're basically making static content. we can call this
         // later by UnsplashApi.BASE_URL
         const val BASE_URL = "https://api.unsplash.com/"
-        const val ACCESS_KEY = BuildConfig.APPLICATION_ID
+        const val ACCESS_KEY = BuildConfig.UNSPLASH_ACCESS_KEY
     }
-    @Headers("Accept-Version: v1", "Authorization: $ACCESS_KEY")
+    @Headers("Accept-Version: v1", "Authorization: Client-ID $ACCESS_KEY")
     @GET("search/photos")
     suspend fun searchPhotos(  // suspend functions don't run on main thread - this is how we handle threading - this
         // can be passed and resumed later without blocking the thread we're on. don't wait for the function to finish.

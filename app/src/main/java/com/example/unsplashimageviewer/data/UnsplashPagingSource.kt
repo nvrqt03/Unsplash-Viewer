@@ -46,7 +46,7 @@ class UnsplashPagingSource(
     }
 
     override fun getRefreshKey(state: PagingState<Int, UnsplashPhoto>): Int? {
-        TODO("Not yet implemented")
+        return state.anchorPosition
     }
 
 }
