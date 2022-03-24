@@ -5,12 +5,16 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.paging.LoadState
 import com.example.unsplashimageviewer.R
 import com.example.unsplashimageviewer.databinding.FragmentGalleryBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_gallery.*
+import kotlinx.android.synthetic.main.fragment_gallery.progress_bar
+import kotlinx.android.synthetic.main.unsplash_photo_load_state_footerr.*
 
 @AndroidEntryPoint
 class GalleryFragment : Fragment(R.layout.fragment_gallery) {
@@ -47,9 +51,12 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
 
             // now after creating the photo  load state adapter
             recycler_view.adapter = adapter.withLoadStateHeaderAndFooter(
-                header = UnsplashPhotoLoadStateAdapter  { adapter.retry() },
+                header = UnsplashPhotoLoadStateAdapter { adapter.retry() },
                 footer = UnsplashPhotoLoadStateAdapter { adapter.retry() }
             )
+            buttonRetry.setOnClickListener {
+                adapter.retry()
+            }
         }
 
         // observe photos live data. important to pass viewLifecycleOwner to the live
@@ -67,7 +74,38 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
             // that ids visible on the screen. the fragtment instance itself is just a container.
         }
 
-        setHasOptionsMenu(true) // need this to display the options menu in the fragment - won't even see it
+        // we are working on getting the progress bar to show when searching, or the textView that shows when the rv is empty
+        // meaning no search results
+        // loadState is of type CombinedLoadStates which combines the load states of different scenarios into one object. the
+        // loadstates for when we refresh the dataset or when we append new data to it. we can use this to check for new
+        // make our views visible or invisible
+        adapter.addLoadStateListener { loadState ->
+            binding.apply {
+                // we are refreshing the list with a new dataset, progress bar is visible. otherwise invisible
+                progress_bar.isVisible = loadState.source.refresh is LoadState.Loading
+                // data is done loading, everything is fine
+                recyclerView.isVisible = loadState.source.refresh is LoadState.NotLoading
+
+                // visible if something goes wrong, like no internet connection
+                buttonRetry.isVisible = loadState.source.refresh is LoadState.Error
+                textView_error.isVisible = loadState.source.refresh is LoadState.Error
+
+                // when do we show empty textView?
+                if (loadState.source.refresh is LoadState.NotLoading &&
+                    // means no more items left to be loaded - end of data
+                    loadState.append.endOfPaginationReached &&
+                    adapter.itemCount < 1
+                ) {
+                    recyclerView.isVisible = false
+                    textViewEmpty.isVisible = true
+                } else {
+                    textViewEmpty.isVisible = false
+                }
+
+            }
+
+            setHasOptionsMenu(true) // need this to display the options menu in the fragment - won't even see it
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
