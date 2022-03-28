@@ -8,8 +8,10 @@ import android.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.example.unsplashimageviewer.R
+import com.example.unsplashimageviewer.data.UnsplashPhoto
 import com.example.unsplashimageviewer.databinding.FragmentGalleryBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_gallery.*
@@ -17,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_gallery.progress_bar
 import kotlinx.android.synthetic.main.unsplash_photo_load_state_footerr.*
 
 @AndroidEntryPoint
-class GalleryFragment : Fragment(R.layout.fragment_gallery) {
+class GalleryFragment : Fragment(R.layout.fragment_gallery), UnsplashPhotoAdapter.OnItemClickListener {
 
     // since we added the android entry point above, this will be injected by dagger
     // and the view model itslef
@@ -44,7 +46,7 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
 
         _binding = FragmentGalleryBinding.bind(view)
 
-        val adapter = UnsplashPhotoAdapter()
+        val adapter = UnsplashPhotoAdapter(this)
 
         binding.apply {
             recycler_view.setHasFixedSize(true)
@@ -145,9 +147,16 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
 
     }
 
-    // calling this and setting binding to null to release the reference will be released when the view is destroyed
+    // calling this and setting binding to null to release the reference -  will be released when the view is destroyed
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onItemClick(photo: UnsplashPhoto) {
+        // remember in the nav_graph we navigated to the details fragment and under arguments made it parcelable. This
+        // allows us to send the parameters in a compile time safe way rather than putting in a bundle like java
+        val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(photo)
+        findNavController().navigate(action)
     }
 }

@@ -11,7 +11,7 @@ import com.example.unsplashimageviewer.R
 import com.example.unsplashimageviewer.data.UnsplashPhoto
 import com.example.unsplashimageviewer.databinding.UnsplashItemBinding
 
-class UnsplashPhotoAdapter :
+class UnsplashPhotoAdapter(private val listener : OnItemClickListener) :
     PagingDataAdapter<UnsplashPhoto, UnsplashPhotoAdapter.PhotoViewHolder>(PHOTO_COMPARATOR) {
 // expects diffutil item callback, which is an item that knows how to calculate changes between two datasets when we later update
 // the recyclerView- between the new data set and old data set. this makes the rv more efficient because if the new list and old list have
@@ -38,8 +38,29 @@ class UnsplashPhotoAdapter :
             holder.bind(currentItem)
         }
     }
-    class PhotoViewHolder(private val binding: UnsplashItemBinding) :
+    inner class PhotoViewHolder(private val binding: UnsplashItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            // we want to send this click to the underlying fragment that contains the rv. we don't want to handle it right here,
+            // because we can't handle navigation inside the adapter. we'll need to create an interface, just like java.
+            binding.root.setOnClickListener{
+                // we need to pass the unsplash photo object, and we can get it with the getItem function we used above
+                // but we need the position of the viewholder in the rv to know which item
+                val position = bindingAdapterPosition
+
+                // adding this check to make sure there is a position (ie it's not animating off of the screen) otherwise
+                // the it may try to use the position of something that is no longer there and the app will crash. not doing
+                // animations here, but a good check to have
+                if (position != RecyclerView.NO_POSITION) {
+                    val item = getItem(position)
+                    if (item != null) {
+                        listener.onItemClick(item)
+                    }
+                }
+
+            }
+        }
 
             fun bind(photo: UnsplashPhoto) {
                 // this apply block is to allow us to not have to write binding.textView or binding.imageView a whole bunch of times
@@ -55,6 +76,10 @@ class UnsplashPhotoAdapter :
                 }
             }
 
+    }
+
+    interface OnItemClickListener {
+        fun onItemClick(photo: UnsplashPhoto)
     }
 
     companion object {

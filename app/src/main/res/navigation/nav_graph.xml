@@ -9,5 +9,17 @@
         android:id="@+id/galleryFragment"
         android:name="com.example.unsplashimageviewer.ui.gallery.GalleryFragment"
         android:label="fragment_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_gallery" >
+        <action
+            android:id="@+id/action_galleryFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailsFragment"
+        android:name="com.example.unsplashimageviewer.ui.details.DetailsFragment"
+        android:label="DetailsFragment" >
+        <argument
+            android:name="photo"
+            app:argType="com.example.unsplashimageviewer.data.UnsplashPhoto" />
+    </fragment>
 </navigation>
