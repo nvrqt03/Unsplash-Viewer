@@ -5,8 +5,8 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
 
-// interface because retrofit will g4enerate implementation for this interaface later, we just
-// need to take care of some methods. interfaces don't have mehtod bodies
+// interface because retrofit will generate implementation for this interface later, we just
+// need to take care of some methods. interfaces don't have method bodies
 interface UnsplashApi {
 
     // this is where you enter the access key
